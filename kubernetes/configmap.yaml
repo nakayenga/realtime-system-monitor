@@ -1,0 +1,33 @@
+apiVersion: v1
+
+kind: ConfigMap
+
+metadata:
+  name: metrics-config
+  namespace: metrics-platform
+
+data:
+
+  KAFKA_TOPIC:
+    "system-metrics"
+
+  KAFKA_DLQ_TOPIC:
+    "system-metrics-dlq"
+
+  KAFKA_GROUP:
+    "metrics-sql-writers"
+
+  KAFKA_SECURITY_PROTOCOL:
+    "SASL_SSL"
+
+  KAFKA_SASL_MECHANISM:
+    "PLAIN"
+
+  KAFKA_SASL_USERNAME:
+    "$ConnectionString"
+
+  BATCH_SIZE:
+    "250"
+
+  FLUSH_INTERVAL_SECONDS:
+    "2"

@@ -1,0 +1,48 @@
+apiVersion: keda.sh/v1alpha1
+
+kind: ScaledObject
+
+metadata:
+
+  name: metrics-consumer-scaler
+
+  namespace: metrics-platform
+
+
+spec:
+
+  scaleTargetRef:
+
+    name: metrics-consumer
+
+
+  minReplicaCount: 1
+
+  maxReplicaCount: 4
+
+
+  pollingInterval: 30
+
+  cooldownPeriod: 120
+
+
+  triggers:
+
+    - type: kafka
+
+      metadata:
+
+        bootstrapServers:
+          YOUR_NAMESPACE.servicebus.windows.net:9093
+
+        consumerGroup:
+          metrics-sql-writers
+
+        topic:
+          system-metrics
+
+        lagThreshold:
+          "1000"
+
+        offsetResetPolicy:
+          earliest

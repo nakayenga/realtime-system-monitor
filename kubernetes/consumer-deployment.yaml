@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: metrics-consumer
+
+  namespace: metrics-platform
+
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: metrics-consumer
+
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: metrics-consumer
+
+
+    spec:
+
+      containers:
+
+        - name: consumer
+
+          image: systemmonitoracr12345.azurecr.io/metrics-consumer:1.1
+
+          ports:
+
+            - containerPort: 8000
+              name: metrics
+
+            - containerPort: 8080
+              name: health
+
+          envFrom:
+
+            - configMapRef:
+                name: metrics-config
+
+          env:
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+
+              valueFrom:
+
+                secretKeyRef:
+
+                  name: metrics-secrets
+
+                  key: kafka-bootstrap-servers
+
+
+            - name: KAFKA_SASL_PASSWORD
+
+              valueFrom:
+
+                secretKeyRef:
+
+                  name: metrics-secrets
+
+                  key: kafka-password
+
+
+            - name: SQL_CONNECTION_STRING
+
+              valueFrom:
+
+                secretKeyRef:
+
+                  name: metrics-secrets
+
+                  key: sql-connection-string
+
+
+          resources:
+
+            requests:
+
+              cpu: "100m"
+
+              memory: "128Mi"
+
+            limits:
+
+              cpu: "500m"
+
+              memory: "512Mi"
+
+
+          livenessProbe:
+
+            httpGet:
+
+              path: /health/live
+
+              port: health
+
+            initialDelaySeconds: 10
+
+            periodSeconds: 30
+
+
+          readinessProbe:
+
+            httpGet:
+
+              path: /health/ready
+
+              port: health
+
+            initialDelaySeconds: 5
+
+            periodSeconds: 10
